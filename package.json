@@ -1,0 +1,27 @@
+{
+  "name": "secret-inventory-management",
+  "version": "1.0.0",
+  "description": "Secret Inventory Management System with FHE encryption",
+  "main": "index.html",
+  "scripts": {
+    "start": "npx http-server . -p 3000 -c-1 --cors",
+    "compile": "npx hardhat compile",
+    "deploy": "npx hardhat run scripts/deploy.js --network sepolia"
+  },
+  "keywords": [
+    "inventory",
+    "fhe",
+    "encryption",
+    "blockchain",
+    "ethereum"
+  ],
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@fhevm/solidity": "^0.7.0",
+    "@nomicfoundation/hardhat-toolbox": "^4.0.0",
+    "@zama-fhe/oracle-solidity": "^0.0.1",
+    "cross-env": "^7.0.3",
+    "hardhat": "^2.24.3"
+  }
+}
