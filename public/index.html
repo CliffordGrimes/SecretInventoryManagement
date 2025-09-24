@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secret Inventory Management - FHE Privacy System</title>
+    <meta name="description" content="Confidential warehouse management system using Fully Homomorphic Encryption for ultimate privacy">
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.8.0/dist/ethers.umd.min.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <div class="header-content">
+                <div class="logo">
+                    <div class="logo-icon">🏭</div>
+                    <h1>Secret Inventory</h1>
+                    <span class="subtitle">Confidential Warehouse Management</span>
+                </div>
+                <div class="network-info">
+                    <div id="networkStatus" class="network-status">
+                        <span class="status-indicator"></span>
+                        <span class="status-text">Disconnected</span>
+                    </div>
+                    <button id="connectWallet" class="connect-btn">Connect Wallet</button>
+                </div>
+            </div>
+        </header>
+
+        <nav class="tab-nav">
+            <button class="tab-btn active" data-tab="inventory">📦 Inventory</button>
+            <button class="tab-btn" data-tab="orders">📋 Orders</button>
+            <button class="tab-btn" data-tab="suppliers">🏪 Suppliers</button>
+            <button class="tab-btn" data-tab="management">⚙️ Management</button>
+            <button class="tab-btn" data-tab="analytics">📊 Analytics</button>
+        </nav>
+
+        <main class="main-content">
+            <!-- Inventory Management Tab -->
+            <div id="inventory" class="tab-content active">
+                <div class="section-header">
+                    <h2>📦 Inventory Management</h2>
+                    <button id="addItemBtn" class="action-btn primary">+ Add New Item</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">📊</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="totalItems">0</div>
+                            <div class="stat-label">Total Items</div>
+                        </div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="activeItems">0</div>
+                            <div class="stat-label">Active Items</div>
+                        </div>
+                    </div>
+                    <div class="stat-card alert">
+                        <div class="stat-icon">⚠️</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="lowStockItems">0</div>
+                            <div class="stat-label">Low Stock Alerts</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="inventory-list">
+                    <div class="list-header">
+                        <h3>Inventory Items</h3>
+                        <button id="refreshInventory" class="refresh-btn">🔄 Refresh</button>
+                    </div>
+                    <div id="inventoryItems" class="items-grid">
+                        <!-- Items will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Orders Tab -->
+            <div id="orders" class="tab-content">
+                <div class="section-header">
+                    <h2>📋 Stock Orders</h2>
+                    <button id="newOrderBtn" class="action-btn primary">+ New Order</button>
+                </div>
+
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-icon">⏳</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="pendingOrders">0</div>
+                            <div class="stat-label">Pending Orders</div>
+                        </div>
+                    </div>
+                    <div class="stat-card success">
+                        <div class="stat-icon">✅</div>
+                        <div class="stat-content">
+                            <div class="stat-value" id="fulfilledOrders">0</div>
+                            <div class="stat-label">Fulfilled Orders</div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="orders-list">
+                    <div id="ordersList" class="orders-grid">
+                        <!-- Orders will be loaded here -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suppliers Tab -->
+            <div id="suppliers" class="tab-content">
+                <div class="section-header">
+                    <h2>🏪 Supplier Management</h2>
+                    <button id="authorizeSupplierBtn" class="action-btn primary">+ Authorize Supplier</button>
+                </div>
+
+                <div id="suppliersList" class="suppliers-grid">
+                    <!-- Suppliers will be loaded here -->
+                </div>
+            </div>
+
+            <!-- Management Tab -->
+            <div id="management" class="tab-content">
+                <div class="section-header">
+                    <h2>⚙️ System Management</h2>
+                </div>
+
+                <div class="management-grid">
+                    <div class="management-card">
+                        <h3>👥 Manager Access</h3>
+                        <div class="form-group">
+                            <label>Authorize New Manager:</label>
+                            <input type="text" id="newManagerAddress" placeholder="0x..." class="input-field">
+                            <button id="authorizeManagerBtn" class="action-btn secondary">Authorize</button>
+                        </div>
+                    </div>
+
+                    <div class="management-card">
+                        <h3>🔒 Access Control</h3>
+                        <div class="form-group">
+                            <label>Grant Item Access:</label>
+                            <input type="number" id="accessItemId" placeholder="Item ID" class="input-field">
+                            <input type="text" id="accessUserAddress" placeholder="User Address" class="input-field">
+                            <button id="grantAccessBtn" class="action-btn secondary">Grant Access</button>
+                        </div>
+                    </div>
+
+                    <div class="management-card danger">
+                        <h3>🚨 Emergency Controls</h3>
+                        <button id="emergencyPauseBtn" class="action-btn danger">Emergency Pause</button>
+                        <p class="warning-text">⚠️ This will deactivate all inventory items</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics" class="tab-content">
+                <div class="section-header">
+                    <h2>📊 Analytics Dashboard</h2>
+                </div>
+
+                <div class="analytics-grid">
+                    <div class="analytics-card">
+                        <h3>📈 System Overview</h3>
+                        <div id="systemStats" class="stats-list">
+                            <!-- System stats will be loaded here -->
+                        </div>
+                    </div>
+
+                    <div class="analytics-card">
+                        <h3>🔐 FHE Security Status</h3>
+                        <div class="security-indicators">
+                            <div class="security-item">
+                                <span class="security-label">Encryption:</span>
+                                <span class="security-status active">Active</span>
+                            </div>
+                            <div class="security-item">
+                                <span class="security-label">Privacy Mode:</span>
+                                <span class="security-status active">Confidential</span>
+                            </div>
+                            <div class="security-item">
+                                <span class="security-label">Access Control:</span>
+                                <span class="security-status active">Restricted</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Modals -->
+    <div id="addItemModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Add New Inventory Item</h3>
+                <span class="close" data-modal="addItemModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Item Name:</label>
+                    <input type="text" id="itemName" placeholder="Enter item name" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Initial Quantity:</label>
+                    <input type="number" id="itemQuantity" placeholder="Enter quantity" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Unit Price (ETH):</label>
+                    <input type="number" id="itemPrice" placeholder="Enter price in ETH" class="input-field" step="0.001" required>
+                </div>
+                <div class="form-group">
+                    <label>Minimum Stock Level:</label>
+                    <input type="number" id="minStockLevel" placeholder="Enter minimum level" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Supplier Address:</label>
+                    <input type="text" id="supplierAddress" placeholder="0x..." class="input-field" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn secondary" data-modal="addItemModal">Cancel</button>
+                <button id="submitItem" class="action-btn primary">Add Item</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="newOrderModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Place New Order</h3>
+                <span class="close" data-modal="newOrderModal">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label>Item ID:</label>
+                    <input type="number" id="orderItemId" placeholder="Enter item ID" class="input-field" required>
+                </div>
+                <div class="form-group">
+                    <label>Requested Quantity:</label>
+                    <input type="number" id="orderQuantity" placeholder="Enter quantity" class="input-field" required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="action-btn secondary" data-modal="newOrderModal">Cancel</button>
+                <button id="submitOrder" class="action-btn primary">Place Order</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="status" class="status-message"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
